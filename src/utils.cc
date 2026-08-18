@@ -23,7 +23,7 @@ TokenKind classify_identifier(std::string_view view) {
 
 void parse_cl_arguments(CompilationContext& ctxt, int argc, char* argv[]) {
 
-    PARACL_ASSERT(argc != 2) << "Wrong arguments, pass \'-h\' for help.\n";
+    PARACL_ASSERT(argc == 2) << "Wrong arguments, pass \'-h\' for help.\n";
 
     if(strcmp(argv[1],"-h") == 0) {
         std::cout << "HWPL, ParaCL interpreter\n" <<\
@@ -33,7 +33,7 @@ void parse_cl_arguments(CompilationContext& ctxt, int argc, char* argv[]) {
         std::exit(0);
     }
     std::ifstream fs(argv[1]);
-    PARACL_ASSERT(!fs.is_open()) << "Failed to open input file.";
+    PARACL_ASSERT(fs.is_open()) << "Failed to open input file.";
 
     std::stringstream buffer;
     buffer << fs.rdbuf();

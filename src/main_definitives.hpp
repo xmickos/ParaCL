@@ -6,13 +6,6 @@
 
 #pragma once
 
-#define PARACL_ASSERT(condition) \
-        if (condition) \
-            std::cerr << ""
-
-#define PARACL_UNREACHABLE() \
-        std::cerr << ""
-
 struct Node;
 
 struct AST {

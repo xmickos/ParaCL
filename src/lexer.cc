@@ -41,7 +41,6 @@ void do_lexer_work(CompilationContext& ctxt) {
         PARSE_ONE_CHAR(')', TokenKind::CloseRoundBracket);
         PARSE_ONE_CHAR('\0', TokenKind::CloseRoundBracket);
 
-        PARACL_UNREACHABLE() << "Lexer error: \'" << ch << "\' at position " << curr_loc << std::endl;
-        std::terminate();
+        PARACL_UNREACHABLE() << "Lexer error: \'" << ch << "\' at position " << curr_loc;
     }
 }
