@@ -4,7 +4,7 @@
 void do_lexer_work(CompilationContext& ctxt) {
 
     std::string& src = ctxt.src;
-    std::vector<Token>& tokens = ctxt.token_stream.tokens;
+    std::vector<Token>& tokens = ctxt.tokens;
 
    Token token;
    size_t curr_loc = 0, curr_len = 0;
@@ -17,7 +17,7 @@ void do_lexer_work(CompilationContext& ctxt) {
             continue;
         }
         if(token.kind == TokenKind::Identifier && !may_be_identifier(ch)) {
-            token.lexem = std::string_view(&src[curr_loc - 1], curr_len);
+            token.lexem = std::string_view(&src[curr_loc - curr_len], curr_len);
             token.kind = classify_identifier(token.lexem);
             token.loc = curr_loc - curr_len;
             tokens.push_back(token);

@@ -8,7 +8,7 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 add_executable(run_tests test_lexer.cc)
-target_link_libraries(run_tests PRIVATE gtest_main lexer_lib)
+target_link_libraries(run_tests PRIVATE gtest_main lexer)
 
 include(GoogleTest)
 gtest_discover_tests(run_tests)

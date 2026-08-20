@@ -41,15 +41,23 @@ struct Token {
     TokenKind kind = TokenKind::Undefined;
     size_t loc;
     std::string_view lexem;
-};
 
-struct TokenStream final {
-    std::vector<Token> tokens;
+    bool operator==(Token& rhs) {
+        return  (kind == rhs.kind) &&
+                (loc == rhs.loc) &&
+                (lexem == rhs.lexem);
+    }
+
+    bool operator==(const Token& rhs) const {
+        return  (kind == rhs.kind) &&
+                (loc == rhs.loc) &&
+                (lexem == rhs.lexem);
+    }
 };
 
 struct CompilationContext final {
     std::string src;
-    TokenStream token_stream;
+    std::vector<Token> tokens;
     AST ast;
 };
 
