@@ -8,9 +8,11 @@ add_compile_options(-Wall -Werror -O0 -g -std=c++17)
 
 add_library(lexer src/lexer.cc src/main_definitives.hpp src/utils.cc)
 
+add_library(parser src/parser.cc src/main_definitives.hpp src/ast.hpp src/utils.cc)
+
 add_executable(paracl src/paracl.cc src/utils.cc src/lexer.cc)
 
-target_link_libraries(paracl PRIVATE lexer)
+target_link_libraries(paracl PRIVATE lexer parser)
 
 enable_testing()
 add_subdirectory(tests)

@@ -21,7 +21,7 @@ TokenKind classify_identifier(std::string_view view) {
 }
 
 
-void parse_cl_arguments(CompilationContext& ctxt, int argc, char* argv[]) {
+bool parse_cl_arguments(CompilationContext& ctxt, int argc, char* argv[]) {
 
     PARACL_ASSERT(argc == 2) << "Wrong arguments, pass \'-h\' for help.\n";
 
@@ -38,4 +38,6 @@ void parse_cl_arguments(CompilationContext& ctxt, int argc, char* argv[]) {
     std::stringstream buffer;
     buffer << fs.rdbuf();
     ctxt.src = buffer.str();
+
+    return true;
 }

@@ -1,7 +1,7 @@
 #include "utils.hpp"
 #include "main_definitives.hpp"
 
-void do_lexer_work(CompilationContext& ctxt) {
+bool do_lexer_work(CompilationContext& ctxt) {
 
     std::string& src = ctxt.src;
     std::vector<Token>& tokens = ctxt.tokens;
@@ -43,4 +43,6 @@ void do_lexer_work(CompilationContext& ctxt) {
 
         PARACL_UNREACHABLE() << "Lexer error: \'" << ch << "\' at position " << curr_loc;
     }
+
+    return true;
 }

@@ -15,7 +15,7 @@
             continue;                                                                   \
         }
 
-void parse_cl_arguments(CompilationContext& ctxt, int argc, char* argv[]);
+bool parse_cl_arguments(CompilationContext& ctxt, int argc, char* argv[]);
 
 bool may_be_identifier(char ch);
 

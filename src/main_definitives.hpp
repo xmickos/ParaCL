@@ -61,4 +61,6 @@ struct CompilationContext final {
     AST ast;
 };
 
-void do_lexer_work(CompilationContext& ctxt);
+bool do_lexer_work(CompilationContext& ctxt);
+
+bool do_parser_work(CompilationContext& ctxt);
