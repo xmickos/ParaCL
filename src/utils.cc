@@ -41,3 +41,8 @@ bool parse_cl_arguments(CompilationContext& ctxt, int argc, char* argv[]) {
 
     return true;
 }
+
+char Token::as_char() const {
+    PARACL_ASSERT(lexem.size() == 1) << "Can't be reinterpreted as char: " << lexem;
+    return lexem[0];
+}
