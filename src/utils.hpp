@@ -1,5 +1,6 @@
 #include <cctype>
 #include <sstream>
+#include "ast.hpp"
 #include "main_definitives.hpp"
 
 #pragma once
@@ -48,3 +49,5 @@ class AssertHandler final {
             if(condition) { ; } else AssertHandler(#condition, __FILE__, __LINE__)
 
 #define PARACL_UNREACHABLE() AssertHandler("unreachable", __FILE__, __LINE__)
+
+#define REPORT_PARSER_ERROR(str, tokens, p) PARACL_UNREACHABLE() << "Syntax error at pos " << p << ": expected " << str << " but got "  << tokens[p].lexem;

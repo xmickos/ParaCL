@@ -9,6 +9,7 @@ bool do_lexer_work(CompilationContext& ctxt) {
    Token token;
    size_t curr_loc = 0, curr_len = 0;
 
+    // TODO: rewrite to separate identifiers from literals
     for(char ch : src) {
         if(((token.kind == TokenKind::Undefined) || (token.kind == TokenKind::Identifier)) && may_be_identifier(ch)) {
             curr_len++;

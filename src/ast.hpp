@@ -1,12 +1,65 @@
-#include "main_definitives.hpp"
-#include "utils.hpp"
 #include <charconv>
 
-enum class OpKind {
+#pragma once
+
+enum class TokenKind {
+    OpenBracket,
+    CloseBracket,
+    OpenRoundBracket,
+    CloseRoundBracket,
+
+    Identifier,
+
+    WhileKeyword,
+    IfKeyword,
+    PrintKeyword,
+
+    Assign,
+    PlusOperand,
+    MinusOperand,
+    MultiplyOperand,
+    DivideOperand,
+
+    Input,
+    Semicolon,
+
+    Undefined,
+    EndOfFile
+};
+
+struct Token {
+    TokenKind kind = TokenKind::Undefined;
+    size_t loc;
+    std::string_view lexem;
+
+    bool operator==(const Token& rhs) const {
+        return  (kind == rhs.kind) &&
+                (loc == rhs.loc) &&
+                (lexem == rhs.lexem);
+    }
+
+    bool operator==(const char ch) const {
+        return (lexem.size() == 1) && (lexem[0] == ch);
+    }
+
+    bool operator!=(const Token& rhs) const {
+        return !(*this == rhs);
+    }
+
+    bool operator!=(const Token& rhs) {
+        return !(*this == rhs);
+    }
+
+    char as_char() const;
+};
+
+enum class ExpressionType {
     PlusOp,
     MinusOp,
     MulOp,
-    DivOp
+    DivOp,
+    Constant,
+    Identifier
 };
 
 enum class StatementKind {
@@ -16,15 +69,13 @@ enum class StatementKind {
     WhileStatement
 };
 
-struct Operand {};
-
 struct ASTNode {
     virtual ~ASTNode() = default;
 };
 
 struct Statement : public ASTNode {
     StatementKind kind;
-    std::vector<Operand> args;
+    std::vector<Statement> args;
 };
 
 struct Block : public Statement {
@@ -32,12 +83,13 @@ struct Block : public Statement {
 };
 
 struct Expression : public ASTNode {
-    std::vector<Operand> operands;
+    ExpressionType type;
+    std::vector<Expression> operands;
+    std::variant<int, std::string_view, std::monostate> raw_data;
 };
 
-struct BinOp final : public Statement {
-    OpKind kind;
-    Expression lhs, rhs;
+struct AST {
+    Expression root;
 };
 
 
@@ -47,14 +99,15 @@ struct BinOp final : public Statement {
     G ::= E;
     E ::= T{[+-]T}*
     T ::= P{[*\]P}*
-    P ::= '('E')' | N
+    P ::= '('E')' | N | I
     N ::= ['0'-'9']+
+    I ::= L{L|N}*
+    L ::= {['a'-'z'] | ['A'-'Z'] | '_'}+
 */
 
-#define REPORT_PARSER_ERROR(str, tokens, p) PARACL_UNREACHABLE() << "Syntax error at pos " << p << ": expected " << str << " but got "  << tokens[p].lexem;
-
-int getG(CompilationContext& ctxt);
-int getE(const std::vector<Token>& tokens, size_t& p);
-int getT(const std::vector<Token>& tokens, size_t& p);
-int getP(const std::vector<Token>& tokens, size_t& p);
-int getN(const std::vector<Token>& tokens, size_t& p);
+Expression getG(const std::vector<Token>& tokens);
+Expression getE(const std::vector<Token>& tokens, size_t& p);
+Expression getT(const std::vector<Token>& tokens, size_t& p);
+Expression getP(const std::vector<Token>& tokens, size_t& p);
+Expression getI(const std::vector<Token>& tokens, size_t& p);
+Expression getN(const std::vector<Token>& tokens, size_t& p);
