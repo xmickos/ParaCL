@@ -6,7 +6,7 @@ int getE(const std::vector<Token>& tokens, size_t& p) {
 
     int val = getT(tokens, p);
 
-    while(tokens[p] == '+' || tokens[p] == '-') {
+    while(tokens[p].kind == TokenKind::PlusOperand || tokens[p].kind == TokenKind::MinusOperand) {
         switch(tokens[p].as_char()) {
             case '+':
                 p++;
@@ -25,7 +25,7 @@ int getE(const std::vector<Token>& tokens, size_t& p) {
 
 int getT(const std::vector<Token>& tokens, size_t& p) {
     int val = getP(tokens, p);
-    while(tokens[p] == '*' || tokens[p] == '/') {
+    while(tokens[p].kind == TokenKind::MultiplyOperand || tokens[p].kind == TokenKind::DivideOperand) {
         switch(tokens[p].as_char()) {
             case '*':
                 p++;
@@ -42,10 +42,10 @@ int getT(const std::vector<Token>& tokens, size_t& p) {
 
 int getP(const std::vector<Token>& tokens, size_t& p) {
     int val;
-    if(tokens[p].as_char() == '(') {
+    if(tokens[p].kind == TokenKind::OpenRoundBracket) {
         p++;
         val = getE(tokens, p);
-        if(tokens[p].as_char() != ')') {
+        if(tokens[p].kind != TokenKind::CloseRoundBracket) {
             REPORT_PARSER_ERROR("closing bracket", tokens, p);
         }
         p++;
@@ -56,7 +56,7 @@ int getP(const std::vector<Token>& tokens, size_t& p) {
 }
 
 int getN(const std::vector<Token>& tokens, size_t& p) {
-    if(!std::isdigit(tokens[p].as_char())) {
+    if(tokens[p].kind != TokenKind::Identifier || !std::isdigit(tokens[p].as_char())) {
         REPORT_PARSER_ERROR("number", tokens, p);
     }
     int val;
@@ -69,7 +69,7 @@ int getN(const std::vector<Token>& tokens, size_t& p) {
 int getG(CompilationContext& ctxt) {
     size_t p = 0;
     int val = getE(ctxt.tokens, p);
-    if(ctxt.tokens[p].as_char() != ';') {
+    if(ctxt.tokens[p].kind != TokenKind::Semicolon) {
         REPORT_PARSER_ERROR(';', ctxt.tokens, p);
     }
     return val;
