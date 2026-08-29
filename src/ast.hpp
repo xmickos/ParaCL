@@ -8,7 +8,7 @@ enum class TokenKind {
     OpenRoundBracket,
     CloseRoundBracket,
 
-    Identifier,
+    Terminal,
 
     WhileKeyword,
     IfKeyword,
@@ -59,7 +59,8 @@ enum class ExpressionType {
     MulOp,
     DivOp,
     Constant,
-    Identifier
+    Identifier,
+    Literal
 };
 
 enum class StatementKind {
@@ -99,7 +100,7 @@ struct AST {
     G ::= E;
     E ::= T{[+-]T}*
     T ::= P{[*\]P}*
-    P ::= '('E')' | N | I
+    P ::= '('E')' | I | N
     N ::= ['0'-'9']+
     I ::= L{L|N}*
     L ::= {['a'-'z'] | ['A'-'Z'] | '_'}+

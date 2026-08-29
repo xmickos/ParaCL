@@ -19,12 +19,11 @@ Expression getE(const std::vector<Token>& tokens, size_t& p) {
 Expression getT(const std::vector<Token>& tokens, size_t& p) {
     Expression expr = getP(tokens, p), tmp;
     while(tokens[p].kind == TokenKind::MultiplyOperand || tokens[p].kind == TokenKind::DivideOperand) {
-        p++;
         tmp = std::move(expr);
         expr.operands.push_back(std::move(tmp));
-        expr.type = tokens[p].kind == TokenKind::MultiplyOperand ? ExpressionType::MulOp : ExpressionType::DivOp;
+        expr.type = (tokens[p].kind == TokenKind::MultiplyOperand ? ExpressionType::MulOp : ExpressionType::DivOp);
+        p++;
         expr.operands.push_back(getP(tokens, p));
-        expr = std::move(tmp);
     }
     return expr;
 }
@@ -39,11 +38,20 @@ Expression getP(const std::vector<Token>& tokens, size_t& p) {
         }
         p++;
         return expr;
-    } else if(tokens[p].kind == TokenKind::Identifier) {
-        return getI(tokens, p);
-    } else {
-        return getN(tokens, p);
+    } else if(tokens[p].kind == TokenKind::Terminal) {
+        if(std::all_of(tokens[p].lexem.begin(), tokens[p].lexem.end(), [](unsigned char ch){ return std::isdigit(ch); })) {
+            return getN(tokens, p);
+        } else {
+            PARACL_ASSERT(!std::isdigit(tokens[p].lexem.front())) << "Wrong literal: " << tokens[p].lexem;
+            Expression expr;
+            expr.type = ExpressionType::Identifier;
+            expr.raw_data = tokens[p].lexem;
+            p++;
+            return expr;
+        }
     }
+
+    return Expression();
 }
 
 Expression getI(const std::vector<Token>& tokens, size_t& p) {
@@ -54,7 +62,7 @@ Expression getI(const std::vector<Token>& tokens, size_t& p) {
 }
 
 Expression getN(const std::vector<Token>& tokens, size_t& p) {
-    if(tokens[p].kind != TokenKind::Identifier || !std::all_of(tokens[p].lexem.begin(), tokens[p].lexem.end(), [](auto ch){ return std::isdigit(ch); })) {
+    if(tokens[p].kind != TokenKind::Terminal || !std::all_of(tokens[p].lexem.begin(), tokens[p].lexem.end(), [](auto ch){ return std::isdigit(ch); })) {
         REPORT_PARSER_ERROR("number", tokens, p);
     }
     Expression expr;

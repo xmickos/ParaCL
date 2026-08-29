@@ -17,7 +17,7 @@ TokenKind classify_identifier(std::string_view view) {
     if(view == "print") {
         return TokenKind::PrintKeyword;
     }
-    return TokenKind::Identifier;
+    return TokenKind::Terminal;
 }
 
 

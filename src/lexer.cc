@@ -11,13 +11,13 @@ bool do_lexer_work(CompilationContext& ctxt) {
 
     // TODO: rewrite to separate identifiers from literals
     for(char ch : src) {
-        if(((token.kind == TokenKind::Undefined) || (token.kind == TokenKind::Identifier)) && may_be_identifier(ch)) {
+        if(((token.kind == TokenKind::Undefined) || (token.kind == TokenKind::Terminal)) && may_be_identifier(ch)) {
             curr_len++;
             curr_loc++;
-            token.kind = TokenKind::Identifier;
+            token.kind = TokenKind::Terminal;
             continue;
         }
-        if(token.kind == TokenKind::Identifier && !may_be_identifier(ch)) {
+        if(token.kind == TokenKind::Terminal && !may_be_identifier(ch)) {
             token.lexem = std::string_view(&src[curr_loc - curr_len], curr_len);
             token.kind = classify_identifier(token.lexem);
             token.loc = curr_loc - curr_len;

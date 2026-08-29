@@ -11,11 +11,11 @@ TEST(End2End, LexerTest1) {
     do_lexer_work(ctxt);
 
     std::vector<Token> ground_truth = {
-        Token{TokenKind::Identifier, 9, std::string_view(&ctxt.src[9], 1)},
+        Token{TokenKind::Terminal, 9, std::string_view(&ctxt.src[9], 1)},
         Token{TokenKind::Assign, 11, std::string_view(&ctxt.src[11], 1)},
         Token{TokenKind::Input, 13, std::string_view(&ctxt.src[13], 1)},
         Token{TokenKind::PrintKeyword, 23, std::string_view(&ctxt.src[23], 5)},
-        Token{TokenKind::Identifier, 29, std::string_view(&ctxt.src[29], 1)},
+        Token{TokenKind::Terminal, 29, std::string_view(&ctxt.src[29], 1)},
         Token{TokenKind::Semicolon, 30, std::string_view(&ctxt.src[30], 1)}
     };
     EXPECT_TRUE(std::equal(ctxt.tokens.begin(), ctxt.tokens.end(), ground_truth.begin()));
@@ -38,14 +38,14 @@ TEST(UnitTests, classify_identifier) {
     std::string while1 = "while", while2 = "whiel", while3 = "WHILE";
 
     EXPECT_EQ(classify_identifier(print1), TokenKind::PrintKeyword);
-    EXPECT_EQ(classify_identifier(print2), TokenKind::Identifier);
-    EXPECT_EQ(classify_identifier(print3), TokenKind::Identifier);
+    EXPECT_EQ(classify_identifier(print2), TokenKind::Terminal);
+    EXPECT_EQ(classify_identifier(print3), TokenKind::Terminal);
 
     EXPECT_EQ(classify_identifier(if1), TokenKind::IfKeyword);
-    EXPECT_EQ(classify_identifier(if2), TokenKind::Identifier);
-    EXPECT_EQ(classify_identifier(if3), TokenKind::Identifier);
+    EXPECT_EQ(classify_identifier(if2), TokenKind::Terminal);
+    EXPECT_EQ(classify_identifier(if3), TokenKind::Terminal);
 
     EXPECT_EQ(classify_identifier(while1), TokenKind::WhileKeyword);
-    EXPECT_EQ(classify_identifier(while2), TokenKind::Identifier);
-    EXPECT_EQ(classify_identifier(while3), TokenKind::Identifier);
+    EXPECT_EQ(classify_identifier(while2), TokenKind::Terminal);
+    EXPECT_EQ(classify_identifier(while3), TokenKind::Terminal);
 }
