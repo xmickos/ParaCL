@@ -7,6 +7,10 @@ bool may_be_identifier(char ch) {
     return std::isalnum(ch) || (ch == '_');
 }
 
+bool is_a_number(std::string_view lexem) {
+    return std::all_of(lexem.begin(), lexem.end(), [](unsigned char ch){ return std::isdigit(ch); });
+}
+
 TokenKind classify_identifier(std::string_view view) {
     if(view == "while") {
         return TokenKind::WhileKeyword;

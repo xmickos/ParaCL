@@ -18,6 +18,8 @@
 
 bool parse_cl_arguments(CompilationContext& ctxt, int argc, char* argv[]);
 
+bool is_a_number(std::string_view lexem);
+
 bool may_be_identifier(char ch);
 
 TokenKind classify_identifier(std::string_view view);

@@ -18,6 +18,21 @@ Expression getE(const std::vector<Token>& tokens, size_t& p) {
     return expr;
 }
 
+Expression getStatement(const std::vector<Token>& tokens, size_t& p) {
+    Expression expr = getT(tokens, p);
+    if(tokens[p].kind == TokenKind::Assign) {
+        p++;
+        Expression assign_expr{ExpressionType::Assign, {expr, getStatement(tokens, p)}, std::monostate{}};
+        return assign_expr;
+    }
+    if(tokens[p].kind == TokenKind::PlusOperand || tokens[p].kind == TokenKind::MinusOperand) {
+        p++;
+        Expression term_expr((tokens[p].kind == TokenKind::PlusOperand) ? ExpressionType::PlusOp : ExpressionType::MinusOp, {expr, getT(tokens, p)}, std::monostate{});
+        return term_expr;
+    }
+    return expr;
+}
+
 Expression getT(const std::vector<Token>& tokens, size_t& p) {
     Expression expr = getP(tokens, p), tmp;
     while(tokens[p].kind == TokenKind::MultiplyOperand || tokens[p].kind == TokenKind::DivideOperand) {
@@ -42,30 +57,23 @@ Expression getP(const std::vector<Token>& tokens, size_t& p) {
         p++;
         return expr;
     } else if(tokens[p].kind == TokenKind::Terminal) {
-        if(std::all_of(tokens[p].lexem.begin(), tokens[p].lexem.end(), [](unsigned char ch){ return std::isdigit(ch); })) {
-            return getN(tokens, p);
-        } else {
-            PARACL_ASSERT(!std::isdigit(tokens[p].lexem.front())) << "Wrong literal: " << tokens[p].lexem;
-            Expression expr;
-            expr.type = ExpressionType::Identifier;
-            expr.raw_data = tokens[p].lexem;
-            p++;
-            return expr;
-        }
+        return (is_a_number(tokens[p].lexem) ? getN(tokens, p) : getI(tokens, p));
     }
 
     return Expression();
 }
 
 Expression getI(const std::vector<Token>& tokens, size_t& p) {
+    PARACL_ASSERT(!std::isdigit(tokens[p].lexem.front()) || tokens[p].kind != TokenKind::Terminal) << "Wrong literal: " << tokens[p].lexem;
     Expression expr;
     expr.type = ExpressionType::Identifier;
     expr.raw_data = tokens[p].lexem;
+    p++;
     return expr;
 }
 
 Expression getN(const std::vector<Token>& tokens, size_t& p) {
-    if(tokens[p].kind != TokenKind::Terminal || !std::all_of(tokens[p].lexem.begin(), tokens[p].lexem.end(), [](auto ch){ return std::isdigit(ch); })) {
+    if(tokens[p].kind != TokenKind::Terminal || !is_a_number(tokens[p].lexem)) {
         REPORT_PARSER_ERROR("number", tokens, p);
     }
     Expression expr;
@@ -82,7 +90,7 @@ std::vector<Expression> getG(const std::vector<Token>& tokens) {
     size_t p = 0;
     std::vector<Expression> roots;
     do {
-        roots.push_back(getE(tokens, p));
+        roots.push_back(getStatement(tokens, p));
         if(tokens[p].kind != TokenKind::Semicolon) {
             REPORT_PARSER_ERROR(';', tokens, p);
         }
