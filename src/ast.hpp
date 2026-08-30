@@ -90,14 +90,14 @@ struct Expression : public ASTNode {
 };
 
 struct AST {
-    Expression root;
+    std::vector<Expression> roots;
 };
 
 
 /*
-    Parser grammatic:
+    Parser grammar:
 
-    G ::= E;
+    G ::= {E;}+
     E ::= T{[+-]T}*
     T ::= P{[*\]P}*
     P ::= '('E')' | I | N
@@ -106,7 +106,7 @@ struct AST {
     L ::= {['a'-'z'] | ['A'-'Z'] | '_'}+
 */
 
-Expression getG(const std::vector<Token>& tokens);
+std::vector<Expression> getG(const std::vector<Token>& tokens);
 Expression getE(const std::vector<Token>& tokens, size_t& p);
 Expression getT(const std::vector<Token>& tokens, size_t& p);
 Expression getP(const std::vector<Token>& tokens, size_t& p);

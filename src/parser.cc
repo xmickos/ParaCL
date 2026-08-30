@@ -6,9 +6,11 @@ Expression getE(const std::vector<Token>& tokens, size_t& p) {
     Expression expr = getT(tokens, p), tmp;
 
     while(tokens[p].kind == TokenKind::PlusOperand || tokens[p].kind == TokenKind::MinusOperand) {
-        p++;
+        tmp = std::move(expr);
         tmp.operands.push_back(std::move(expr));
-        tmp.type = tokens[p].kind == TokenKind::PlusOperand ? ExpressionType::PlusOp : ExpressionType::MinusOp;
+        expr.operands.clear();
+        tmp.type = (tokens[p].kind == TokenKind::PlusOperand ? ExpressionType::PlusOp : ExpressionType::MinusOp);
+        p++;
         tmp.operands.push_back(getT(tokens, p));
         expr = std::move(tmp);
     }
@@ -20,6 +22,7 @@ Expression getT(const std::vector<Token>& tokens, size_t& p) {
     Expression expr = getP(tokens, p), tmp;
     while(tokens[p].kind == TokenKind::MultiplyOperand || tokens[p].kind == TokenKind::DivideOperand) {
         tmp = std::move(expr);
+        expr.operands.clear();
         expr.operands.push_back(std::move(tmp));
         expr.type = (tokens[p].kind == TokenKind::MultiplyOperand ? ExpressionType::MulOp : ExpressionType::DivOp);
         p++;
@@ -75,17 +78,21 @@ Expression getN(const std::vector<Token>& tokens, size_t& p) {
     return expr;
 }
 
-Expression getG(const std::vector<Token>& tokens) {
+std::vector<Expression> getG(const std::vector<Token>& tokens) {
     size_t p = 0;
-    Expression expr = getE(tokens, p);
-    if(tokens[p].kind != TokenKind::Semicolon) {
-        REPORT_PARSER_ERROR(';', tokens, p);
-    }
-    return expr;
+    std::vector<Expression> roots;
+    do {
+        roots.push_back(getE(tokens, p));
+        if(tokens[p].kind != TokenKind::Semicolon) {
+            REPORT_PARSER_ERROR(';', tokens, p);
+        }
+        p++;
+    } while (p != tokens.size());
+    return roots;
 }
 
 
 bool do_parser_work(CompilationContext& ctxt) {
-    ctxt.ast.root = getG(ctxt.tokens);
+    ctxt.ast.roots = getG(ctxt.tokens);
     return true;
 }
