@@ -25,7 +25,7 @@ bool do_lexer_work(CompilationContext& ctxt) {
             curr_len = 0;
             token = Token();
         }
-        if(ch == ' ' || ch == '\n') {
+        if(is_a_whitespace(ch)) {
             curr_loc++;
             continue;
         }
@@ -40,10 +40,17 @@ bool do_lexer_work(CompilationContext& ctxt) {
         PARSE_ONE_CHAR('}', TokenKind::CloseBracket);
         PARSE_ONE_CHAR('(', TokenKind::OpenRoundBracket);
         PARSE_ONE_CHAR(')', TokenKind::CloseRoundBracket);
-        PARSE_ONE_CHAR('\0', TokenKind::CloseRoundBracket);
 
         PARACL_UNREACHABLE() << "Lexer error: \'" << ch << "\' at position " << curr_loc;
     }
+    if(token.kind == TokenKind::Terminal) {
+        token.lexem = std::string_view(&src[curr_loc - curr_len], curr_len);
+        token.kind = classify_identifier(token.lexem);
+        token.loc = curr_loc - curr_len;
+        tokens.push_back(token);
+    }
+
+    tokens.push_back(Token{TokenKind::EndOfFile, curr_loc, {}});
 
     return true;
 }

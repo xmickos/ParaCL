@@ -50,3 +50,7 @@ char Token::as_char() const {
     PARACL_ASSERT(lexem.size() == 1) << "Can't be reinterpreted as char: " << lexem;
     return lexem[0];
 }
+
+bool is_a_whitespace(char ch) {
+    return ch == ' ' || ch == '\n' || ch == '\t' || ch == '\r';
+}

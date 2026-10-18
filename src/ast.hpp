@@ -61,7 +61,8 @@ enum class ExpressionType {
     Constant,
     Identifier,
     Literal,
-    Assign
+    Assign,
+    Undefined
 };
 
 enum class StatementKind {
@@ -89,7 +90,7 @@ struct Expression : public ASTNode {
     std::vector<Expression> operands;
     std::variant<int, std::string_view, std::monostate> raw_data;
 
-    Expression() = default;
+    Expression() : type(ExpressionType::Undefined), raw_data(std::monostate{}) {}
     Expression(ExpressionType type_, std::vector<Expression> operands_, std::variant<int, std::string_view, std::monostate> raw_data_ = std::monostate{})
         : type(type_), operands(operands_), raw_data(raw_data_) {}
 };
@@ -101,12 +102,12 @@ struct AST {
 
 /*
     Parser grammar:
-    Parser grammar:
 
     G ::= {S;}+
     S ::= T S_tail
-    S_tail ::= '=' S | {[+-]T}*
-    E ::= T{[+-]T}*
+    S_tail ::= '=' S | E_tail
+    E ::= T E_tail
+    E_tail :: = {[+-]T}*
     T ::= P{[*\]P}*
     P ::= '('E')' | I | N
     N ::= ['0'-'9']+

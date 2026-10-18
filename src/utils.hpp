@@ -41,15 +41,19 @@ class AssertHandler final {
             return *this;
         }
 
-        ~AssertHandler() {
+        [[noreturn]] ~AssertHandler() {
             std::cerr << "Assertion " << cond_str << " failed at " << file << ":" << line << ": " << ss.str() << std::endl;
             std::abort();
         }
 };
+
+bool is_a_whitespace(char ch);
 
 #define PARACL_ASSERT(condition) \
             if(condition) { ; } else AssertHandler(#condition, __FILE__, __LINE__)
 
 #define PARACL_UNREACHABLE() AssertHandler("unreachable", __FILE__, __LINE__)
 
-#define REPORT_PARSER_ERROR(str, tokens, p) PARACL_UNREACHABLE() << "Syntax error at pos " << p << ": expected " << str << " but got "  << tokens[p].lexem;
+#define REPORT_PARSER_ERROR(str, tokens, p) PARACL_UNREACHABLE() \
+        << "Syntax error at pos " << p << ": expected " << str << " but got "  \
+        << (tokens[p].kind == TokenKind::EndOfFile ? "end of file" : tokens[p].lexem);

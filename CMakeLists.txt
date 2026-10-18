@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.14)
 project(ParaCL LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDART 17)
-set(CMAKE_CXX_STANDART_REQUIRED ON)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_compile_options(-Wall -Werror -O0 -g -std=c++17)
 

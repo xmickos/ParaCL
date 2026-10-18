@@ -1,36 +1,39 @@
 #include "main_definitives.hpp"
 #include "utils.hpp"
 
-Expression getE(const std::vector<Token>& tokens, size_t& p) {
-
-    Expression expr = getT(tokens, p), tmp;
-
+Expression getE_tail(const std::vector<Token>& tokens, size_t& p, Expression expr) {
+    Expression tmp;
     while(tokens[p].kind == TokenKind::PlusOperand || tokens[p].kind == TokenKind::MinusOperand) {
         tmp = std::move(expr);
-        tmp.operands.push_back(std::move(expr));
         expr.operands.clear();
-        tmp.type = (tokens[p].kind == TokenKind::PlusOperand ? ExpressionType::PlusOp : ExpressionType::MinusOp);
+        expr.raw_data = std::monostate{};
+        expr.operands.push_back(std::move(tmp));
+        expr.type = (tokens[p].kind == TokenKind::PlusOperand ? ExpressionType::PlusOp : ExpressionType::MinusOp);
         p++;
-        tmp.operands.push_back(getT(tokens, p));
-        expr = std::move(tmp);
+        expr.operands.push_back(getT(tokens, p));
     }
 
     return expr;
 }
 
+Expression getE(const std::vector<Token>& tokens, size_t& p) {
+
+    Expression expr = getT(tokens, p);
+
+    return getE_tail(tokens, p, std::move(expr));
+}
+
 Expression getStatement(const std::vector<Token>& tokens, size_t& p) {
     Expression expr = getT(tokens, p);
     if(tokens[p].kind == TokenKind::Assign) {
+        if(expr.type != ExpressionType::Identifier) {
+            REPORT_PARSER_ERROR("wrong lhs is assing op", tokens, p);
+        }
         p++;
         Expression assign_expr{ExpressionType::Assign, {expr, getStatement(tokens, p)}, std::monostate{}};
         return assign_expr;
     }
-    if(tokens[p].kind == TokenKind::PlusOperand || tokens[p].kind == TokenKind::MinusOperand) {
-        p++;
-        Expression term_expr((tokens[p].kind == TokenKind::PlusOperand) ? ExpressionType::PlusOp : ExpressionType::MinusOp, {expr, getT(tokens, p)}, std::monostate{});
-        return term_expr;
-    }
-    return expr;
+    return getE_tail(tokens, p, std::move(expr));
 }
 
 Expression getT(const std::vector<Token>& tokens, size_t& p) {
@@ -38,6 +41,7 @@ Expression getT(const std::vector<Token>& tokens, size_t& p) {
     while(tokens[p].kind == TokenKind::MultiplyOperand || tokens[p].kind == TokenKind::DivideOperand) {
         tmp = std::move(expr);
         expr.operands.clear();
+        expr.raw_data = std::monostate{};
         expr.operands.push_back(std::move(tmp));
         expr.type = (tokens[p].kind == TokenKind::MultiplyOperand ? ExpressionType::MulOp : ExpressionType::DivOp);
         p++;
@@ -58,9 +62,9 @@ Expression getP(const std::vector<Token>& tokens, size_t& p) {
         return expr;
     } else if(tokens[p].kind == TokenKind::Terminal) {
         return (is_a_number(tokens[p].lexem) ? getN(tokens, p) : getI(tokens, p));
+    } else {
+        REPORT_PARSER_ERROR("terminal token", tokens, p);
     }
-
-    return Expression();
 }
 
 Expression getI(const std::vector<Token>& tokens, size_t& p) {
@@ -95,7 +99,7 @@ std::vector<Expression> getG(const std::vector<Token>& tokens) {
             REPORT_PARSER_ERROR(';', tokens, p);
         }
         p++;
-    } while (p != tokens.size());
+    } while (tokens[p].kind != TokenKind::EndOfFile);
     return roots;
 }
 
